@@ -1,26 +1,144 @@
 @import "tailwindcss";
 
+/*
+  Emplay Demand-Gen Workspace — design tokens.
+  Brand palette is exactly the colors Lisha provided: violet hsl(262 83% 58%) / #7c3bed,
+  text #0f1729 (strong) + #5e6978 (secondary), bg #F8FAFC + #ffffff, font Poppins.
+  Swap exact hex here in one place — never hard-code color in components.
+  Semantic status hues (success/warning/info/nurture) are kept only to communicate state.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand — Emplay violet (the only brand color provided) */
+  --primary: hsl(262 83% 58%);          /* #7c3bed — primary actions, brand, selected states */
+  --primary-hover: hsl(262 83% 50%);
+  --primary-subtle: #f1eefe;            /* light violet — AI chips, RECOMMENDED pill, selected tint */
+  --primary-border: #d8cefb;
+  --primary-fg: #ffffff;
+
+  /* Accent reuses the brand violet (no separate accent color was provided) */
+  --accent: hsl(262 83% 58%);           /* brand mark, FAB, queue badge, "now" focus moments */
+  --accent-subtle: #f1eefe;
+
+  /* Routing / status */
+  --nurture-bg: #fdf0e2;
+  --nurture-fg: #b45309;
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --warning: #d97706;
+  --warning-bg: #fef3c7;
+  --info: #2563eb;
+  --info-bg: #dbeafe;
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
+
+  /* Text — exactly the two values provided */
+  --text-strong: #0f1729;               /* headings, names, key values */
+  --text: #5e6978;                      /* body */
+  --text-muted: #5e6978;                /* secondary, captions, "—" axes */
+  --border: #e5e7eb;
+  --border-subtle: #eef0f2;
+  --surface: #ffffff;
+  --surface-muted: #f9fafb;             /* panels, table headers */
+  --canvas: #f8fafc;                    /* app background (Emplay) */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-border: var(--primary-border);
+  --color-primary-fg: var(--primary-fg);
+
+  --color-accent: var(--accent);
+  --color-accent-subtle: var(--accent-subtle);
+
+  --color-nurture-bg: var(--nurture-bg);
+  --color-nurture-fg: var(--nurture-fg);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+
+  --color-strong: var(--text-strong);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-canvas: var(--canvas);
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Eyebrow labels — uppercase, tracked (spec §8.2) */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Restrained generating shimmer (spec §10 — animation) */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: shimmer 1.4s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+/* Visible keyboard focus (spec §10 quality floor) */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6dae1;
+  border-radius: 999px;
 }
