@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Check, CheckCircle2, ChevronDown, Clock, ListChecks, Sparkles, type LucideIcon } from "@/components/ui/icons";
+import { AlertTriangle, CalendarClock, Check, CheckCircle2, ChevronDown, Clock, ListChecks, ShieldCheck, Sparkles, TrendingUp, type LucideIcon } from "@/components/ui/icons";
 import { useStore } from "@/lib/store";
 import { useRenewalStore } from "@/lib/renewalStore";
 import { gbp, gbpCompact, eur, eurCompact, accountsAsTaskRows } from "@/lib/renewalData";
@@ -44,6 +44,42 @@ const WHY_TITLE: Record<string, string> = {
 const calInitials = (name: string) => name.trim().split(/\s+/).slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase();
 const daysSoft = (d: number) => (d <= 30 ? "bg-danger-bg text-danger" : d <= 90 ? "bg-warning-bg text-warning" : "bg-surface-muted text-muted");
 const daysText = (d: number) => (d <= 30 ? "text-danger" : d <= 90 ? "text-warning" : "text-muted");
+
+// Dashboard numbers — same UI as the demand-gen Home banner (one box, divided
+// segments, tone-coloured numbers).
+type DashTone = "primary" | "warning" | "danger" | "info" | "success";
+const DASH_NUM: Record<DashTone, string> = {
+  primary: "text-primary", warning: "text-warning", danger: "text-danger", info: "text-info", success: "text-success",
+};
+const DASHBOARD: { label: string; value: string; icon: LucideIcon; tone: DashTone }[] = [
+  { label: "Open tasks", value: "16", icon: ListChecks, tone: "primary" },
+  { label: "Due ≤30 days", value: "3", icon: CalendarClock, tone: "warning" },
+  { label: "High risk", value: "5", icon: AlertTriangle, tone: "danger" },
+  { label: "Need approval", value: "16", icon: ShieldCheck, tone: "info" },
+  { label: "Saving offered", value: "€529,853", icon: TrendingUp, tone: "success" },
+];
+
+function RenewalDashboard() {
+  return (
+    <div
+      className="mt-6 grid overflow-hidden rounded-2xl border border-primary-border/60 bg-gradient-to-r from-surface via-surface to-primary-subtle shadow-sm"
+      style={{ gridTemplateColumns: `repeat(${DASHBOARD.length}, minmax(0, 1fr))` }}
+    >
+      {DASHBOARD.map((it, i) => {
+        const Icon = it.icon;
+        return (
+          <div key={it.label} className={cn("px-4 py-3.5", i > 0 && "border-l border-primary-border/40")}>
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+              <span className="eyebrow">{it.label}</span>
+              <Icon className={cn("h-4 w-4", DASH_NUM[it.tone])} />
+            </div>
+            <span className={cn("text-2xl font-semibold tabular-nums", DASH_NUM[it.tone])}>{it.value}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export function RenewalTasksHome() {
   const approvals = useRenewalStore((s) => s.approvals);
@@ -92,7 +128,10 @@ export function RenewalTasksHome() {
           </div>
 
           {tab === "tasks" ? (
-            <RenewalTaskBoard onAction={addToast} />
+            <>
+              <RenewalDashboard />
+              <RenewalTaskBoard onAction={addToast} />
+            </>
           ) : (
             <ComingSoon tab={tab} approvalCount={approvals.length} />
           )}
@@ -121,16 +160,21 @@ function RenewalTaskBoard({ onAction }: { onAction: (message: string) => void })
   const [sort, setSort] = useState<SortId>("due");
   const [sortOpen, setSortOpen] = useState(false);
   const rows = accountsAsTaskRows().sort(SORT_FN[sort]);
+  const worth = rows.filter((r) => r.daysToExpiry <= 60).reduce((sum, r) => sum + r.value, 0);
   const [selectedId, setSelectedId] = useState(rows[0]?.id ?? "");
   const selected = rows.find((r) => r.id === selectedId) ?? rows[0];
 
   return (
-    <div className="mt-6 flex max-h-[calc(100vh-16rem)] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+    <div className="mt-6 flex max-h-[calc(100vh-22rem)] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-5 py-3.5">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-base font-semibold text-strong">Renewal tasks</h2>
           <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-semibold tabular-nums text-muted">{rows.length}</span>
+          <span className="hidden items-center gap-2 text-[13px] text-muted sm:flex">
+            <span className="text-border" aria-hidden>|</span>
+            Next 60 days · <span className="font-semibold text-strong">{gbpCompact(worth)}</span> to save
+          </span>
         </div>
         <div className="relative">
           <button
