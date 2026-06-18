@@ -20,7 +20,6 @@ export function ClarifyThread() {
   const answers = useStore((s) => s.clarifyAnswers);
   const setAnswer = useStore((s) => s.setClarifyAnswer);
   const buildPlan = useStore((s) => s.buildPlan);
-  const addChat = useStore((s) => s.addChat);
 
   const [index, setIndex] = useState(0);
   // Questions the user has actually tapped — so a smart-default-filled question
@@ -31,33 +30,16 @@ export function ClarifyThread() {
   const isAnswered = (qi: number) =>
     CLARIFY_QUESTIONS[qi].segments.every((seg) => (answers[seg.id]?.length ?? 0) > 0);
 
-  // The user's chosen chips for a question, as a readable line for the chat history.
-  const answerSummary = (q: (typeof CLARIFY_QUESTIONS)[number]) =>
-    q.segments
-      .map((seg) =>
-        (answers[seg.id] ?? [])
-          .map((id) => seg.options.find((o) => o.id === id)?.label)
-          .filter(Boolean)
-          .join(", "),
-      )
-      .filter(Boolean)
-      .join(" · ");
-
   // Advance once the active question is confirmed + fully answered. The Plan is NOT
-  // built automatically — the user generates it from the sticky footer button.
-  // The question, the chosen answer, and the ack are recorded to the chat history.
+  // built automatically — the user generates it from the sticky footer button. The
+  // Q&A is NOT echoed to the chat: it lives in the plan itself (the "Your answers"
+  // section), so the rep sees it as part of the plan rather than buried in the thread.
   useEffect(() => {
     if (index >= CLARIFY_QUESTIONS.length) return;
     const q = CLARIFY_QUESTIONS[index];
     if (!touched.includes(q.id) || !isAnswered(index) || acked.current.has(q.id)) return;
     acked.current.add(q.id);
-    const advance = () => {
-      addChat("agent", q.question, "Auto");
-      addChat("user", answerSummary(q), "Auto");
-      addChat("agent", q.ack, "Auto");
-      setIndex((i) => i + 1);
-    };
-    const t = setTimeout(advance, prefersReducedMotion() ? 0 : 550);
+    const t = setTimeout(() => setIndex((i) => i + 1), prefersReducedMotion() ? 0 : 550);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answers, index, touched]);

@@ -126,7 +126,7 @@ export function Recommendation({
 
   const footer = (
     <div className="flex items-center gap-3 border-t border-border bg-surface px-3 py-3">
-      <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-surface-muted px-3 py-2 focus-within:border-primary-border focus-within:bg-surface">
+      <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-surface-muted px-3 py-2 transition-colors hover:border-primary-border hover:bg-surface focus-within:border-primary focus-within:bg-surface">
         <Sparkles className="h-4 w-4 shrink-0 text-primary" />
         <input
           value={edit}

@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} h-full`}>
-      <body className="min-h-full">
+    <html lang="en" className={`${poppins.variable} h-full`} suppressHydrationWarning>
+      <body className="min-h-full" suppressHydrationWarning>
         <AppShell>{children}</AppShell>
       </body>
     </html>

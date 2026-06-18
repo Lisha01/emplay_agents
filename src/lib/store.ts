@@ -11,6 +11,7 @@ import type {
   ClarifyAnswers,
   Lead,
   Mode,
+  Persona,
   Plan,
   Rule,
   RunAttentionItem,
@@ -19,6 +20,7 @@ import type {
 } from "./types";
 import * as seed from "./mockData";
 import { derivePlan, runAttentionItems } from "./autoMode";
+import { DEFAULT_CONNECTED } from "./integrations";
 
 let idCounter = 1000;
 const nextId = (p: string) => `${p}-${++idCounter}`;
@@ -52,6 +54,10 @@ export interface Toast {
 }
 
 interface State {
+  // workspace persona — null until onboarding picks one (gates the onboarding overlay)
+  persona: Persona | null;
+  connectedIntegrations: string[]; // integration ids connected (onboarding Step 2 + Settings)
+
   // shell / run config
   mode: Mode;
   scenario: Scenario;
@@ -99,6 +105,8 @@ interface State {
   toasts: Toast[];
 
   // actions
+  setPersona: (p: Persona) => void;
+  toggleIntegration: (id: string) => void;
   setMode: (m: Mode) => void;
   setScenario: (s: Scenario) => void;
   setPlanFirst: (v: boolean) => void;
@@ -173,6 +181,8 @@ const freshData = () => ({
 });
 
 export const useStore = create<State>((set, get) => ({
+  persona: null,
+  connectedIntegrations: [...DEFAULT_CONNECTED],
   mode: "autonomous",
   scenario: "expansion",
   currentStep: 1,
@@ -199,6 +209,13 @@ export const useStore = create<State>((set, get) => ({
   chat: seedChat(),
   toasts: [],
 
+  setPersona: (persona) => set({ persona }),
+  toggleIntegration: (id) =>
+    set((s) => ({
+      connectedIntegrations: s.connectedIntegrations.includes(id)
+        ? s.connectedIntegrations.filter((x) => x !== id)
+        : [...s.connectedIntegrations, id],
+    })),
   setMode: (mode) => set({ mode }),
   setScenario: (scenario) => set({ scenario }),
   setPlanFirst: (planFirst) => set({ planFirst }),
@@ -632,6 +649,7 @@ export const useStore = create<State>((set, get) => ({
 
   resetDemo: () =>
     set({
+      connectedIntegrations: [...DEFAULT_CONNECTED],
       mode: "autonomous",
       scenario: "expansion",
       currentStep: 1,
