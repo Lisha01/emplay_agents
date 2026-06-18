@@ -23,6 +23,8 @@ export function WorkbookShell({
   onCommand,
   footer,
   sheets,
+  header,
+  left,
 }: {
   canvas: React.ReactNode;
   aside?: React.ReactNode;
@@ -33,6 +35,10 @@ export function WorkbookShell({
   footer?: React.ReactNode;
   /** Replaces the PlanRail under the Sheets tab (e.g. the autonomous-run rail). */
   sheets?: React.ReactNode;
+  /** Replaces the default demand-gen header (e.g. the renewal account header). */
+  header?: React.ReactNode;
+  /** Replaces the whole left pane (e.g. the renewal Stages + Chat pane). */
+  left?: React.ReactNode;
 }) {
   const scenario = useStore((s) => s.scenario);
   const resetDemo = useStore((s) => s.resetDemo);
@@ -41,33 +47,35 @@ export function WorkbookShell({
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4">
-        <h1 className="text-sm font-semibold text-strong">Unified Demand-Gen Workspace</h1>
-        <span className="text-border">·</span>
-        <span className="rounded-md bg-surface-muted px-2 py-0.5 text-xs font-medium text-text">
-          {SCENARIOS[scenario]}
-        </span>
+      {header ?? (
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4">
+          <h1 className="text-sm font-semibold text-strong">Unified Demand-Gen Workspace</h1>
+          <span className="text-border">·</span>
+          <span className="rounded-md bg-surface-muted px-2 py-0.5 text-xs font-medium text-text">
+            {SCENARIOS[scenario]}
+          </span>
 
-        <button
-          onClick={() => resetDemo()}
-          title="Reset demo"
-          className="ml-auto flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-muted hover:bg-surface-muted hover:text-strong"
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-          Reset demo
-        </button>
-        <button
-          onClick={() => addToast("Workspace saved", "success")}
-          className="flex h-8 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-xs font-medium text-strong hover:bg-surface-muted"
-        >
-          <Save className="h-3.5 w-3.5" />
-          Save
-        </button>
-      </header>
+          <button
+            onClick={() => resetDemo()}
+            title="Reset demo"
+            className="ml-auto flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-muted hover:bg-surface-muted hover:text-strong"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            Reset demo
+          </button>
+          <button
+            onClick={() => addToast("Workspace saved", "success")}
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-xs font-medium text-strong hover:bg-surface-muted"
+          >
+            <Save className="h-3.5 w-3.5" />
+            Save
+          </button>
+        </header>
+      )}
 
-      {/* Body: PlanRail · (Canvas + ContextPanel) over CommandBar */}
+      {/* Body: left pane · (Canvas + aside) over the bottom bar */}
       <div className="flex min-h-0 flex-1">
-        <LeftPanel sheets={sheets} />
+        {left ?? <LeftPanel sheets={sheets} />}
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex min-h-0 flex-1">
             <section className="min-w-0 flex-1 overflow-y-auto">{canvas}</section>

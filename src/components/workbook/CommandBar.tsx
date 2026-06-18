@@ -26,7 +26,7 @@ export function CommandBar({
 
   return (
     <div className="border-t border-border bg-surface px-4 py-3">
-      <div className="mx-auto flex max-w-4xl items-center gap-2 rounded-xl border border-border bg-surface-muted px-3 py-2 focus-within:border-primary-border focus-within:bg-surface">
+      <div className="mx-auto flex max-w-4xl items-center gap-2 rounded-xl border border-border bg-surface-muted px-3 py-2 transition-colors hover:border-primary-border hover:bg-surface focus-within:border-primary focus-within:bg-surface">
         <Sparkles className="h-4 w-4 shrink-0 text-primary" />
         {scope && (
           <span className="shrink-0 rounded-md bg-primary-subtle px-2 py-0.5 text-xs font-medium text-primary">

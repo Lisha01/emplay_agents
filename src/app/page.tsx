@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  AlertCircle,
+  AlertTriangle,
   ArrowRight,
   ArrowUp,
   Bell,
@@ -11,7 +11,6 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  Database,
   Filter,
   Info,
   ListChecks,
@@ -21,10 +20,12 @@ import {
   Reply,
   Search,
   Send,
+  ShieldCheck,
   Sparkles,
   Square,
   Sun,
   Target,
+  TrendingUp,
   Users,
   Zap,
   type LucideIcon,
@@ -36,6 +37,7 @@ import { Button } from "@/components/ui/Button";
 import { ModeToggle } from "@/components/auto/ModeToggle";
 import { computeStats } from "@/components/campaigns/shared";
 import { CampaignsTable } from "@/components/campaigns/CampaignsTable";
+import { RenewalHome } from "@/components/renewal/RenewalHome";
 import { cn } from "@/lib/utils";
 
 // The seed/demo query (this prompt's source of truth).
@@ -95,7 +97,7 @@ function MetricBanner({ items }: { items: Metric[] }) {
 // ── shared table-header controls ──────────────────────────────────────────────
 function SearchBox({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-2.5 py-1.5">
+    <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-2.5 py-1.5 transition-colors hover:border-primary-border focus-within:border-primary">
       <Search className="h-3.5 w-3.5 text-muted" />
       <input
         value={value}
@@ -248,7 +250,8 @@ function LeadsTable({ leads }: { leads: Lead[] }) {
   );
 }
 
-export default function Home() {
+/** Demand-Gen home — the triage/landing for the Demand Generation persona. */
+function DemandGenHome() {
   const [value, setValue] = useState(SEED_QUERY);
   const [mode, setMode] = useState<Mode>("autonomous");
   const [tab, setTab] = useState<TabId>("today");
@@ -296,9 +299,9 @@ export default function Home() {
   const leadItems: Metric[] = [
     { icon: Users, label: "Leads", value: leads.length },
     { icon: CheckCircle2, label: "MQL", value: leads.filter(isMql).length, tone: "success" },
-    { icon: Zap, label: "Nurture", value: leads.filter(isNurture).length, tone: "warning" },
-    { icon: AlertCircle, label: "DQ", value: leads.filter((l) => l.score < 40).length, tone: "danger" },
-    { icon: Database, label: "In queue", value: leads.filter((l) => l.queued).length, tone: "info" },
+    { icon: AlertTriangle, label: "High risk", value: 5, tone: "danger" },
+    { icon: ShieldCheck, label: "Need approval", value: 16, tone: "warning" },
+    { icon: TrendingUp, label: "Saving offered", value: "€529,853", tone: "success" },
   ];
 
   const cs = computeStats(campaigns);
@@ -335,7 +338,7 @@ export default function Home() {
         </div>
 
         {/* Command start */}
-        <div className="rounded-2xl border border-border bg-surface px-4 pb-2.5 pt-3 shadow-sm focus-within:border-primary-border">
+        <div className="rounded-2xl border border-border bg-surface px-4 pb-2.5 pt-3 shadow-sm transition-colors hover:border-primary-border focus-within:border-primary">
           <textarea
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -552,4 +555,10 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+/** Home route — renders the workspace for the active persona. */
+export default function Home() {
+  const persona = useStore((s) => s.persona);
+  return persona === "renewal" ? <RenewalHome /> : <DemandGenHome />;
 }

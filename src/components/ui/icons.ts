@@ -14,6 +14,7 @@ export {
   FileText,
   GitBranch,
   ListChecks,
+  Lock,
   MapPin,
   Megaphone,
   PauseCircle,
@@ -81,6 +82,9 @@ export {
   MagicWand as Wand2,
   Lightning as Zap,
   Pulse as Activity,
+  Warning as AlertTriangle,
+  ShieldCheck,
+  Flame,
 } from "@phosphor-icons/react/dist/ssr";
 
 // The icon component type (kept under the old name so existing annotations work).

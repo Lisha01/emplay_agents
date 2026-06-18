@@ -1,6 +1,8 @@
 // Data model for the prototype (spec §9). Mock-data only, in-memory.
 
 export type Source = "hubspot" | "salesforce" | "upload";
+/** Which workspace the user is in. Chosen at onboarding, switchable from the icon rail. */
+export type Persona = "demandgen" | "renewal";
 export type Mode = "assist" | "augment" | "autonomous";
 export type Scenario = "renewal" | "expansion" | "acquisition";
 export type Channel = "linkedin" | "email" | "whatsapp";

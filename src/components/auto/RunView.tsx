@@ -22,6 +22,7 @@ import { Recommendation } from "@/components/agents/Recommendation";
 import { CampaignBuild } from "@/components/agents/CampaignBuild";
 import type { AgentStep, RunAttentionItem } from "@/lib/types";
 import { WorkbookShell } from "@/components/workbook/WorkbookShell";
+import { PlanView } from "./PlanView";
 import { Badge, routingTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ScoreBar } from "@/components/ui/ScoreBar";
@@ -181,7 +182,7 @@ export function RunView() {
   const canvas = <div className="mx-auto max-w-3xl p-5">{renderOutput()}</div>;
 
   function renderOutput() {
-    if (selected === "plan") return <PlanRecap />;
+    if (selected === "plan") return null; // the Plan sheet renders via its own return below
     const step = selected;
     const status = stepStatus(step);
     const agent = AGENTS[step - 1];
@@ -397,36 +398,6 @@ export function RunView() {
     );
   }
 
-  function PlanRecap() {
-    return (
-      <div className="space-y-4">
-        <header className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-subtle text-primary">
-            <FileText className="h-4.5 w-4.5" />
-          </span>
-          <div>
-            <p className="eyebrow">Approved plan</p>
-            <h2 className="text-base font-semibold text-strong">The contract this run follows</h2>
-          </div>
-        </header>
-        <Panel title="Expanding in">
-          <p className="text-[13px] text-strong">{plan!.hook}</p>
-          <p className="mt-1 text-[13px] text-muted">{plan!.resolvedTargeting}</p>
-          <p className="mt-1 text-[13px] text-muted">≈ {plan!.projectedAccounts} accounts · {plan!.projectedContacts} contacts · {plan!.dailyVolume}</p>
-        </Panel>
-        <Panel title="Escalation rules">
-          <ul className="space-y-2">
-            {plan!.escalationRules.map((r) => (
-              <li key={r} className="flex items-start gap-2 text-[13px] text-text">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" /> {r}
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      </div>
-    );
-  }
-
   const footer = (
     <div className="flex items-center gap-3 border-t border-border bg-surface px-4 py-3 text-[13px]">
       {done ? (
@@ -456,6 +427,12 @@ export function RunView() {
       )}
     </div>
   );
+
+  // The Plan sheet shows the exact plan the rep approved — the same full PlanView
+  // they reviewed pre-run (funnel, Q&A, sequence, rules), now read-only.
+  if (selected === "plan") {
+    return <WorkbookShell sheets={rail} canvas={<PlanView readOnly />} footer={footer} />;
+  }
 
   // Lead Research & Qualification always render their real assist-mode UI (same
   // language as Assist), whether the stage is still streaming or done — the run's

@@ -42,6 +42,18 @@
   --canvas: #f8fafc;                    /* app background (Emplay) */
 }
 
+/* Renewal persona branding — blue primary. Demand-gen keeps the violet above.
+   Overriding --primary on this subtree re-tints every bg/text/border-primary
+   utility (they reference var(--primary) via @theme inline). */
+[data-persona="renewal"] {
+  --primary: #4a90e2;
+  --primary-hover: #3a7bc8;
+  --primary-subtle: #eaf2fc;
+  --primary-border: #c2dbf6;
+  --accent: #4a90e2;
+  --accent-subtle: #eaf2fc;
+}
+
 @theme inline {
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
@@ -132,6 +144,13 @@ body {
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Text fields live inside bordered "type boxes" that highlight on :focus-within,
+   so the field itself shouldn't draw its own focus ring — the box shows it. */
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+textarea:focus-visible {
+  outline: none;
 }
 
 ::-webkit-scrollbar {

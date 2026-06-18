@@ -7,14 +7,29 @@ import { PlanRail } from "./PlanRail";
 import { ChatPanel } from "./ChatPanel";
 import { cn } from "@/lib/utils";
 
-/** Left section of the Workbook: tabbed between Sheets (the pipeline) and Chat (history). */
-export function LeftPanel({ sheets }: { sheets?: React.ReactNode }) {
+/**
+ * Left section of the workspace: tabbed between the pipeline (Sheets/Stages) and Chat.
+ * Generic — both personas pass their own `sheets`, `chat`, and counts. Defaults bind to
+ * the demand-gen pipeline + chat so existing call sites are unchanged.
+ */
+export function LeftPanel({
+  sheets,
+  chat,
+  chatCount,
+  sheetsLabel = "Sheets",
+}: {
+  sheets?: React.ReactNode;
+  chat?: React.ReactNode;
+  chatCount?: number;
+  sheetsLabel?: string;
+}) {
   const [tab, setTab] = useState<"sheets" | "chat">("sheets");
-  const chatCount = useStore((s) => s.chat.length);
+  const dgCount = useStore((s) => s.chat.length);
+  const count = chatCount ?? dgCount;
 
   const tabs = [
-    { id: "sheets" as const, label: "Sheets", icon: Layers },
-    { id: "chat" as const, label: "Chat", icon: MessagesSquare, count: chatCount },
+    { id: "sheets" as const, label: sheetsLabel, icon: Layers },
+    { id: "chat" as const, label: "Chat", icon: MessagesSquare, count },
   ];
 
   return (
@@ -39,7 +54,7 @@ export function LeftPanel({ sheets }: { sheets?: React.ReactNode }) {
         ))}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {tab === "sheets" ? sheets ?? <PlanRail /> : <ChatPanel />}
+        {tab === "sheets" ? sheets ?? <PlanRail /> : chat ?? <ChatPanel />}
       </div>
     </aside>
   );
