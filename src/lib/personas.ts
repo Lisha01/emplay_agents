@@ -41,7 +41,7 @@ export const PERSONAS: PersonaMeta[] = [
     description:
       "Stay ahead of every renewal — track the renewal timeline, catch churn-risk and health signals early, and run save and expansion plays before the window closes.",
     icon: RefreshCw,
-    available: false,
+    available: true,
     features: [
       "Renewal pipeline & timeline",
       "Churn-risk & health signals",
